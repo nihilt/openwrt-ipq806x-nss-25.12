@@ -50,15 +50,15 @@ jobs:
             wget zstd
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      # actions/cache@v4 only saves when the whole job succeeds, so a failed build
+      # actions/cache only saves when the whole job succeeds, so a failed build
       # lost everything. Restore here, save below with "if: always()".
       - name: Restore downloads cache
         id: dl-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: dl
           key: dl-${{ matrix.device }}-${{ hashFiles('feeds.conf.default', matrix.seed) }}
@@ -66,7 +66,7 @@ jobs:
 
       # OpenWrt keeps the ccache in ./.ccache when CONFIG_CCACHE_DIR is empty.
       - name: Restore compiler cache (ccache)
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: .ccache
           key: ccache-${{ matrix.device }}-${{ matrix.variant }}-${{ github.sha }}
@@ -124,14 +124,14 @@ jobs:
       # These run even when the build failed, so the next attempt starts warm.
       - name: Save downloads cache
         if: always() && steps.dl-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: dl
           key: dl-${{ matrix.device }}-${{ hashFiles('feeds.conf.default', matrix.seed) }}
 
       - name: Save compiler cache (ccache)
         if: always()
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: .ccache
           key: ccache-${{ matrix.device }}-${{ matrix.variant }}-${{ github.sha }}
@@ -151,7 +151,7 @@ jobs:
           ls -la out
 
       - name: Upload images
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: openwrt-nss-${{ matrix.device }}-${{ matrix.variant }}
           path: out/
@@ -166,7 +166,7 @@ jobs:
       contents: write
     steps:
       - name: Download images
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: out
           merge-multiple: true
